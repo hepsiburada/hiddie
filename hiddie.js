@@ -1,7 +1,7 @@
 'use strict'
 
-const reusify = require('reusify')
-const { pathToRegexp } = require('path-to-regexp')
+import reusify from 'reusify'
+import { pathToRegexp } from 'path-to-regexp'
 
 const Hiddie = complete => {
   const middlewares = []
