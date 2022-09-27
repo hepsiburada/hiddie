@@ -1,11 +1,11 @@
 'use strict'
 
-const reusify = require('reusify')
-const { pathToRegexp } = require('path-to-regexp')
+import reusify from 'reusify'
+import { pathToRegexp } from 'path-to-regexp'
 
-function hiddie (complete) {
-  var middlewares = []
-  var pool = reusify(Holder)
+const Hiddie = complete => {
+  const middlewares = []
+  const pool = reusify(Holder)
 
   return {
     use,
@@ -18,8 +18,8 @@ function hiddie (complete) {
       url = null
     }
 
-    var regexp
-    var keys = []
+    let regexp
+    const keys = []
     if (url) {
       regexp = pathToRegexp(sanitizePrefixUrl(url), keys, {
         end: false,
@@ -28,7 +28,7 @@ function hiddie (complete) {
     }
 
     if (Array.isArray(f)) {
-      for (var val of f) {
+      for (const val of f) {
         middlewares.push({
           regexp,
           keys,
@@ -54,7 +54,7 @@ function hiddie (complete) {
 
     req.originalUrl = req.url
 
-    var holder = pool.get()
+    const holder = pool.get()
     holder.req = req
     holder.res = res
     holder.url = sanitizeUrl(req.url)
@@ -70,13 +70,13 @@ function hiddie (complete) {
     this.context = null
     this.i = 0
 
-    var that = this
+    const that = this
     this.done = function (err) {
-      var req = that.req
-      var res = that.res
-      var url = that.url
-      var context = that.context
-      var i = that.i++
+      const req = that.req
+      const res = that.res
+      const url = that.url
+      const context = that.context
+      const i = that.i++
 
       req.url = req.originalUrl
 
@@ -97,18 +97,18 @@ function hiddie (complete) {
         that.i = 0
         pool.release(that)
       } else {
-        var middleware = middlewares[i]
-        var fn = middleware.fn
-        var regexp = middleware.regexp
-        var keys = middleware.keys
+        const middleware = middlewares[i]
+        const fn = middleware.fn
+        const regexp = middleware.regexp
+        const keys = middleware.keys
         if (regexp) {
-          var result = regexp.exec(url)
+          const result = regexp.exec(url)
           if (result) {
-            var params = {}
+            const params = {}
 
-            for (var j = 1; j < result.length; j++) {
-              var prop = keys[j - 1].name
-              var val = decodeParam(result[j])
+            for (let j = 1; j < result.length; j++) {
+              const prop = keys[j - 1].name
+              const val = decodeParam(result[j])
 
               if (!!val || !Object.prototype.hasOwnProperty.call(params, prop)) {
                 params[prop] = val
@@ -125,14 +125,16 @@ function hiddie (complete) {
             that.done()
           }
         } else {
-          fn(req, res, that.done)
+          try {
+            fn(req, res, that.done)
+          } catch (_) {}
         }
       }
     }
   }
 }
 
-function decodeParam (val) {
+const decodeParam = (val) => {
   if (typeof val !== 'string' || val.length === 0) {
     return val
   }
@@ -149,9 +151,9 @@ function decodeParam (val) {
   }
 }
 
-function sanitizeUrl (url) {
-  for (var i = 0, len = url.length; i < len; i++) {
-    var charCode = url.charCodeAt(i)
+const sanitizeUrl = (url) => {
+  for (let i = 0, len = url.length; i < len; i++) {
+    const charCode = url.charCodeAt(i)
     if (charCode === 63 || charCode === 35) {
       return url.slice(0, i)
     }
@@ -159,11 +161,11 @@ function sanitizeUrl (url) {
   return url
 }
 
-function sanitizePrefixUrl (url) {
+const sanitizePrefixUrl = (url) => {
   if (url === '') return url
   if (url === '/') return ''
   if (url[url.length - 1] === '/') return url.slice(0, -1)
   return url
 }
 
-module.exports = hiddie
+export default Hiddie

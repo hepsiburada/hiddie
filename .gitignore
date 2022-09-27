@@ -1,3 +1,6 @@
+# Bundle
+dist
+
 # Logs
 logs
 *.log
@@ -44,5 +47,6 @@ jspm_packages
 
 # package lock
 package-lock.json
+yarn.lock
 
 .idea

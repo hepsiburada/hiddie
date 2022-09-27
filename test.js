@@ -1,6 +1,6 @@
 'use strict'
 
-const hiddie = require('./hiddie')
+const hiddie = require('./hiddie').default
 const t = require('tap')
 const http = require('http')
 const serveStatic = require('serve-static')
